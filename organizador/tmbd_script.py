@@ -5,7 +5,7 @@ import shutil
 import time
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
-#prueba
+#prueba2
 # Tu API Key de TMDB
 API_KEY = '8eccf967757f87e14c687ed2a9361ad7'
 
