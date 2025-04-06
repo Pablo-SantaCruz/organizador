@@ -2,18 +2,13 @@ import requests
 import os
 import re
 import shutil
-import time
-from watchdog.observers import Observer
-from watchdog.events import FileSystemEventHandler
-#prueba
+import sys
+
 # Tu API Key de TMDB
 API_KEY = '8eccf967757f87e14c687ed2a9361ad7'
 
 # URL base de la API de TMDB
 BASE_URL = 'https://api.themoviedb.org/3'
-
-# Directorio donde están los archivos a procesar
-DIRECTORIO_ARCHIVOS = '/srv/dev-disk-by-uuid-71ae3b67-0294-40c8-b26b-4e5047cd2666/kimchi/biblioteca/Procesador de peliculas'
 
 # Directorio donde se crearán las carpetas de las películas
 DIRECTORIO_MOVIES = '/srv/dev-disk-by-uuid-71ae3b67-0294-40c8-b26b-4e5047cd2666/kimchi/biblioteca/movies'
@@ -126,8 +121,9 @@ def create_movie_directory(title, year, director, countries):
 def move_file_to_directory(file_path, directory):
     # Mover el archivo al directorio correspondiente
     try:
-        shutil.move(file_path, directory)
-        print(f"File moved to: {directory}")
+        destination = os.path.join(directory, os.path.basename(file_path))
+        shutil.move(file_path, destination)
+        print(f"File moved to: {destination}")
     except Exception as e:
         print(f"Error moving file: {e}")
 
@@ -162,56 +158,33 @@ def process_movie(movie_name, year, file_path):
             directory_path = create_movie_directory(first_result['title'], release_year, director, countries)
             if directory_path:
                 # Mover el archivo al directorio creado
-                move_file_to_directory(file_path, os.path.join(directory_path, os.path.basename(file_path)))
+                move_file_to_directory(file_path, directory_path)
     else:
         print(f'No results found for movie: {movie_name}')
 
-class NewFileHandler(FileSystemEventHandler):
-    def on_created(self, event):
-        if not event.is_directory:
-            file_path = event.src_path
-            file_name = os.path.basename(file_path)
-            print(f"\nNew file detected: {file_name}")
-            movie_name, year = clean_movie_name(file_name)
-            print(f"Extracted movie name: {movie_name}")
-            print(f"Extracted year: {year}")
-            process_movie(movie_name, year, file_path)
-
-def process_existing_files():
-    # Procesar todos los archivos existentes en el directorio
-    for file_name in os.listdir(DIRECTORIO_ARCHIVOS):
-        file_path = os.path.join(DIRECTORIO_ARCHIVOS, file_name)
-        if os.path.isfile(file_path):
-            print(f"\nProcessing existing file: {file_name}")
-            movie_name, year = clean_movie_name(file_name)
-            print(f"Extracted movie name: {movie_name}")
-            print(f"Extracted year: {year}")
-            process_movie(movie_name, year, file_path)
+def process_single_file(file_path):
+    if os.path.isfile(file_path):
+        file_name = os.path.basename(file_path)
+        print(f"\nProcessing file: {file_name}")
+        movie_name, year = clean_movie_name(file_name)
+        print(f"Extracted movie name: {movie_name}")
+        print(f"Extracted year: {year}")
+        process_movie(movie_name, year, file_path)
+    else:
+        print(f"Error: {file_path} is not a valid file.")
 
 if __name__ == '__main__':
-    # Verificar si el directorio de archivos existe
-    if not os.path.exists(DIRECTORIO_ARCHIVOS):
-        print(f"Directory {DIRECTORIO_ARCHIVOS} does not exist.")
+    # Verificar si se proporcionó un argumento
+    if len(sys.argv) != 2:
+        print("Usage: python script.py <file_path>")
         exit(1)
-
+    
+    file_path = sys.argv[1]
+    
     # Verificar si el directorio de películas existe
     if not os.path.exists(DIRECTORIO_MOVIES):
         print(f"Directory {DIRECTORIO_MOVIES} does not exist.")
         exit(1)
-
-    # Procesar archivos existentes antes de comenzar a monitorear
-    process_existing_files()
-
-    # Configurar el observador de archivos
-    event_handler = NewFileHandler()
-    observer = Observer()
-    observer.schedule(event_handler, path=DIRECTORIO_ARCHIVOS, recursive=False)
-    observer.start()
-
-    print(f"Monitoring directory: {DIRECTORIO_ARCHIVOS}")
-    try:
-        while True:
-            time.sleep(1)
-    except KeyboardInterrupt:
-        observer.stop()
-    observer.join()
+    
+    # Procesar el archivo
+    process_single_file(file_path)
