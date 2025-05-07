@@ -11,7 +11,7 @@ API_KEY = '8eccf967757f87e14c687ed2a9361ad7'
 BASE_URL = 'https://api.themoviedb.org/3'
 
 # Directorio donde se crearán las carpetas de las películas
-DIRECTORIO_MOVIES = '/srv/dev-disk-by-uuid-71ae3b67-0294-40c8-b26b-4e5047cd2666/kimchi/biblioteca/movies'
+DIRECTORIO_MOVIES = '/srv/dev-disk-by-uuid-71ae3b67-0294-40c8-b26b-4e5047cd2666/kimchi/Biblioteca/movies'
 
 def clean_movie_name(filename):
     # Nuevo regex que maneja paréntesis y títulos complejos
