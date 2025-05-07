@@ -14,40 +14,32 @@ BASE_URL = 'https://api.themoviedb.org/3'
 DIRECTORIO_MOVIES = '/srv/dev-disk-by-uuid-71ae3b67-0294-40c8-b26b-4e5047cd2666/kimchi/biblioteca/movies'
 
 def clean_movie_name(filename):
-    # Expresión regular para extraer el título y el año de la película
-    pattern = r'^(.*?)[ ._-](\d{4})[ ._-]'
+    # Nuevo regex que maneja paréntesis y títulos complejos
+    pattern = r'^(.*?)[ ._(](\d{4})[ ._)]'
     match = re.match(pattern, filename, re.IGNORECASE)
     
     if match:
-        # Extraer el título y el año de la película
         title = match.group(1)
         year = match.group(2)
-        
-        # Limpiar el título: reemplazar puntos, guiones bajos y otros símbolos por espacios
-        title = re.sub(r'[._-]', ' ', title)
-        title = ' '.join(title.split())  # Eliminar espacios adicionales
-        
-        return title.strip(), year  # Devolver el título y el año
+        # Limpieza más robusta:
+        title = re.sub(r'[._-]', ' ', title)  # Reemplaza puntos/guiones por espacios
+        title = re.sub(r'\s+', ' ', title)    # Elimita espacios múltiples
+        return title.strip(), year
     else:
-        # Si no se encuentra un patrón, devolver el nombre original sin extensión y año vacío
         return os.path.splitext(filename)[0], None
 
 def search_movie(query, year=None):
-    # Endpoint para buscar películas
     endpoint = f'{BASE_URL}/search/movie'
-    # Parámetros de la solicitud
     params = {
         'api_key': API_KEY,
         'query': query,
-        'language': 'en-US'  # Cambiamos el idioma a inglés
+        'language': 'es-ES',  # Prioriza español (cambiable a 'en-US' si no hay resultados)
+        'include_adult': True  # Incluye películas no infantiles
     }
-    # Si se proporciona el año, agregarlo a los parámetros de búsqueda
     if year:
-        params['year'] = year
+        params['primary_release_year'] = year  # Más preciso que 'year'
     
-    # Hacer la solicitud GET
     response = requests.get(endpoint, params=params)
-    # Verificar si la solicitud fue exitosa
     if response.status_code == 200:
         return response.json()
     else:
