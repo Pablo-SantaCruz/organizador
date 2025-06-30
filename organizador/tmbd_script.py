@@ -13,7 +13,7 @@ BASE_URL = 'https://api.themoviedb.org/3'
 DIRECTORIO_DESTINO = '/srv/dev-disk-by-uuid-71ae3b67-0294-40c8-b26b-4e5047cd2666/kimchi/Biblioteca/movies'
 
 # Directorio a escanear (ahora fijo)
-DIRECTORIO_FUENTE = '/home/pablo/nextcloud/descargas'
+DIRECTORIO_FUENTE = '/home/pablo/nextcloud'
 
 # Extensiones de archivo de video reconocidas
 EXTENSIONES_VIDEO = ('.mp4', '.avi', '.mkv', '.mov', '.wmv', '.flv', '.m4v')
