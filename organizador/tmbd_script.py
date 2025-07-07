@@ -8,7 +8,7 @@ import sys
 API_KEY = '8eccf967757f87e14c687ed2a9361ad7'
 BASE_URL = 'https://api.themoviedb.org/3'
 DIRECTORIO_DESTINO = '/srv/dev-disk-by-uuid-71ae3b67-0294-40c8-b26b-4e5047cd2666/kimchi/Biblioteca/movies'
-DIRECTORIO_PERMANENTE = '/home/pablo/nextcloud'  # Directorio que siempre se escanea
+DIRECTORIO_PERMANENTE = '/home/pablo/transmission_downloads'  # Directorio que siempre se escanea
 EXTENSIONES_VIDEO = ('.mp4', '.avi', '.mkv', '.mov', '.wmv', '.flv', '.m4v')
 
 def verificar_directorio(directorio):
